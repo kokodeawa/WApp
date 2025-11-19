@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+# Añadir permisos para que el workflow pueda escribir en el repositorio
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -16,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # Usar una versión de Node.js estable
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
