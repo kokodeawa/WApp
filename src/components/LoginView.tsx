@@ -10,6 +10,10 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  // State for recovery modal
+  const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(false);
+  const [allCredentials, setAllCredentials] = useState<{ user: string; pass: string }[]>([]);
+
   const getUsers = () => {
     try {
       const users = window.localStorage.getItem('financial-organizer-users');
@@ -50,58 +54,118 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-neutral-900 flex flex-col justify-center items-center p-4">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-            <i className="fa-solid fa-wallet text-5xl text-blue-500 mb-4"></i>
-            <h1 className="text-3xl font-bold text-neutral-100">Organizador Financiero Pro</h1>
-            <p className="text-neutral-400">Inicia sesión o crea un perfil para continuar</p>
-        </div>
+  const handleOpenRecoveryModal = () => {
+    const users = getUsers();
+    const credentialsArray = Object.entries(users).map(([user, pass]) => ({
+      user,
+      pass: pass as string,
+    }));
+    setAllCredentials(credentialsArray);
+    setIsRecoveryModalOpen(true);
+  };
 
-        <div className="bg-neutral-800 p-8 rounded-3xl shadow-lg">
-            <h2 className="text-2xl font-bold text-center mb-6 text-white">{isRegistering ? 'Crear Perfil' : 'Iniciar Sesión'}</h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                    <label htmlFor="username" className="block text-sm font-medium text-neutral-300">Nombre de Usuario</label>
-                    <input
-                        id="username"
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="w-full mt-1 p-3 bg-neutral-700 text-white border-2 border-neutral-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        autoComplete="username"
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor="password"  className="block text-sm font-medium text-neutral-300">Contraseña</label>
-                    <input
-                        id="password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full mt-1 p-3 bg-neutral-700 text-white border-2 border-neutral-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        autoComplete={isRegistering ? "new-password" : "current-password"}
-                        required
-                    />
-                </div>
-                {error && <p className="text-red-400 text-sm text-center">{error}</p>}
-                <button
-                    type="submit"
-                    className="w-full py-3 px-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20"
-                >
-                    {isRegistering ? 'Registrar y Entrar' : 'Entrar'}
-                </button>
-            </form>
-            <p className="text-center text-sm text-neutral-400 mt-6">
-                {isRegistering ? '¿Ya tienes un perfil?' : '¿No tienes un perfil?'}
-                <button onClick={() => { setIsRegistering(!isRegistering); setError(''); }} className="font-semibold text-blue-400 hover:text-blue-300 ml-1">
-                    {isRegistering ? 'Inicia sesión' : 'Crea uno'}
-                </button>
-            </p>
+  return (
+    <>
+      <div className="min-h-screen bg-neutral-900 flex flex-col justify-center items-center p-4">
+        <div className="w-full max-w-sm">
+          <div className="text-center mb-8">
+              <i className="fa-solid fa-wallet text-5xl text-blue-500 mb-4"></i>
+              <h1 className="text-3xl font-bold text-neutral-100">Organizador Financiero Pro</h1>
+              <p className="text-neutral-400">Inicia sesión o crea un perfil para continuar</p>
+          </div>
+
+          <div className="bg-neutral-800 p-8 rounded-3xl shadow-lg">
+              <h2 className="text-2xl font-bold text-center mb-6 text-white">{isRegistering ? 'Crear Perfil' : 'Iniciar Sesión'}</h2>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                      <label htmlFor="username" className="block text-sm font-medium text-neutral-300">Nombre de Usuario</label>
+                      <input
+                          id="username"
+                          type="text"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                          className="w-full mt-1 p-3 bg-neutral-700 text-white border-2 border-neutral-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          autoComplete="username"
+                          required
+                      />
+                  </div>
+                  <div>
+                      <label htmlFor="password"  className="block text-sm font-medium text-neutral-300">Contraseña</label>
+                      <input
+                          id="password"
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full mt-1 p-3 bg-neutral-700 text-white border-2 border-neutral-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          autoComplete={isRegistering ? "new-password" : "current-password"}
+                          required
+                      />
+                  </div>
+                  {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+                  <button
+                      type="submit"
+                      className="w-full py-3 px-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20"
+                  >
+                      {isRegistering ? 'Registrar y Entrar' : 'Entrar'}
+                  </button>
+              </form>
+              <p className="text-center text-sm text-neutral-400 mt-6">
+                  {isRegistering ? '¿Ya tienes un perfil?' : '¿No tienes un perfil?'}
+                  <button onClick={() => { setIsRegistering(!isRegistering); setError(''); }} className="font-semibold text-blue-400 hover:text-blue-300 ml-1">
+                      {isRegistering ? 'Inicia sesión' : 'Crea uno'}
+                  </button>
+              </p>
+              <div className="text-center mt-4">
+                  <button onClick={handleOpenRecoveryModal} className="text-xs text-neutral-500 hover:text-blue-400 transition-colors">
+                      ¿Olvidaste tus credenciales?
+                  </button>
+              </div>
+          </div>
         </div>
       </div>
-    </div>
+
+      {isRecoveryModalOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+          onClick={() => setIsRecoveryModalOpen(false)}
+        >
+          <div
+            className="bg-neutral-800 rounded-2xl shadow-xl p-8 w-full max-w-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold mb-4 text-neutral-100">Credenciales Guardadas</h2>
+            <p className="text-neutral-400 mb-6 text-sm">Aquí están todos los perfiles guardados en este dispositivo.</p>
+            
+            <div className="space-y-3 max-h-60 overflow-y-auto pr-2 bg-neutral-700/50 p-4 rounded-lg">
+              {allCredentials.length > 0 ? (
+                allCredentials.map(({ user, pass }) => (
+                  <div key={user} className="text-left border-b border-neutral-600 pb-2 last:border-b-0">
+                    <div>
+                      <p className="text-xs text-neutral-400">Usuario:</p>
+                      <p className="font-semibold text-base text-neutral-100">{user}</p>
+                    </div>
+                    <div className="mt-1">
+                      <p className="text-xs text-neutral-400">Contraseña:</p>
+                      <p className="font-semibold text-base text-neutral-100">{pass}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-neutral-500 text-center">No hay perfiles guardados.</p>
+              )}
+            </div>
+
+            <div className="mt-6 text-right">
+              <button
+                onClick={() => setIsRecoveryModalOpen(false)}
+                className="px-4 py-2 rounded-lg bg-neutral-600 text-neutral-200 active:bg-neutral-500 font-semibold"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
