@@ -1,4 +1,5 @@
 
+
 import React, { useMemo, useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BudgetRecord, PayCycleFrequency } from '../types';
