@@ -2,10 +2,15 @@
 import React, { useState, useEffect } from 'react';
 // FIX: Corrected import path for types
 import { CycleProfile, PayCycleConfig, PayCycleFrequency } from '../src/types';
-import { CustomSelect } from './CustomSelect';
+// FIX: Corrected import path for CustomSelect to point to the file with content.
+import { CustomSelect } from '../src/components/CustomSelect';
 
+// FIX: Updated toISODateString to prevent timezone-related date errors.
 const toISODateString = (date: Date): string => {
-  return date.toISOString().split('T')[0];
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 const colors = [
