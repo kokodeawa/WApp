@@ -1,19 +1,19 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Category, BudgetRecord, DailyExpense, PayCycleConfig, FutureExpense, PayCycleFrequency, CycleProfile } from './types';
+import { Category, BudgetRecord, DailyExpense, PayCycleConfig, FutureExpense, PayCycleFrequency, CycleProfile, User } from './types';
 import { INITIAL_CATEGORIES } from './constants';
-import { BudgetChart } from './components/BudgetChart';
-import { Header } from './components/Header';
-import { GlobalSavingsCard } from './components/GlobalSavingsCard';
-import { HistoryView } from './components/HistoryView';
-import { BottomNav } from './components/BottomNav';
-import { HistoryPanel } from './components/HistoryPanel';
-import { BudgetEditorModal } from './components/EditBudgetModal';
-import { SideMenu } from './components/SideMenu';
-import { DailyExpenseView } from './components/DailyExpenseView';
-import { ForceCreateBudgetModal } from './components/ForceCreateBudgetModal';
-import { CalculatorsView } from './components/CalculatorsView';
-import { DeleteConfirmationModal } from './components/DeleteConfirmationModal';
-import { DashboardNotifications } from './components/DashboardNotifications';
+import { Header } from './src/components/Header';
+import { GlobalSavingsCard } from './src/components/GlobalSavingsCard';
+import { HistoryView } from './src/components/HistoryView';
+import { BottomNav } from './src/components/BottomNav';
+import { HistoryPanel } from './src/components/HistoryPanel';
+import { BudgetEditorModal } from './src/components/EditBudgetModal';
+import { SideMenu } from './src/components/SideMenu';
+import { DailyExpenseView } from './src/components/DailyExpenseView';
+import { ForceCreateBudgetModal } from './src/components/ForceCreateBudgetModal';
+import { CalculatorsView } from './src/components/CalculatorsView';
+import { DeleteConfirmationModal } from './src/components/DeleteConfirmationModal';
+import { DashboardNotifications } from './src/components/DashboardNotifications';
+import { ProfileCustomizationModal } from './src/components/ProfileCustomizationModal';
 
 type ActiveTab = 'dashboard' | 'history' | 'expenses' | 'calculators';
 
@@ -41,7 +41,7 @@ const FabAction: React.FC<FabActionProps> = ({ buttonProps, label, icon }) => (
         </span>
         <button 
             {...buttonProps}
-            className="bg-neutral-200 text-neutral-800 w-10 h-10 rounded-full flex items-center justify-center shadow-md active:bg-neutral-300"
+            className="bg-white dark:bg-neutral-200 text-gray-800 dark:text-neutral-800 w-10 h-10 rounded-full flex items-center justify-center shadow-md active:bg-gray-200 dark:active:bg-neutral-300"
             aria-label={label}
         >
             <i className={`fa-solid ${icon}`}></i>
@@ -57,9 +57,9 @@ const CurrentPeriodSpending: React.FC<CurrentPeriodSpendingProps> = ({
 }) => {
   if (!periodStartDate || !periodEndDate) {
     return (
-      <div className="bg-neutral-800 p-6 rounded-3xl shadow-lg text-center">
-        <h2 className="text-2xl font-bold text-neutral-100 mb-2">Gastos del Período</h2>
-        <p className="text-neutral-400 text-sm">
+      <div className="bg-white dark:bg-neutral-800 p-6 rounded-3xl shadow-lg text-center">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-neutral-100 mb-2">Gastos del Período</h2>
+        <p className="text-gray-500 dark:text-neutral-400 text-sm">
           Configura un <i className="fa-solid fa-cog mx-1"></i><strong>Ciclo de Pago</strong> en la pestaña de Gastos para ver un resumen de tus gastos actuales aquí.
         </p>
       </div>
@@ -71,31 +71,31 @@ const CurrentPeriodSpending: React.FC<CurrentPeriodSpendingProps> = ({
   const formattedEndDate = periodEndDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 
   return (
-    <div className="bg-neutral-800 p-6 rounded-3xl shadow-lg space-y-4 self-start">
-      <div className="border-b border-neutral-700 pb-3 mb-3">
-        <h2 className="text-2xl font-bold text-neutral-100">Gastos del Período Actual</h2>
-        <p className="text-sm text-neutral-400">{formattedStartDate} - {formattedEndDate}</p>
+    <div className="bg-white dark:bg-neutral-800 p-6 rounded-3xl shadow-lg space-y-4 self-start">
+      <div className="border-b border-gray-200 dark:border-neutral-700 pb-3 mb-3">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-neutral-100">Gastos del Período Actual</h2>
+        <p className="text-sm text-gray-500 dark:text-neutral-400">{formattedStartDate} - {formattedEndDate}</p>
       </div>
       
       <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
         {spentByCategory.length > 0 ? (
           spentByCategory.map(({ category, amount }) => (
-            <div key={category.id} className="flex justify-between items-center bg-neutral-700/50 p-3 rounded-lg">
+            <div key={category.id} className="flex justify-between items-center bg-gray-100 dark:bg-neutral-700/50 p-3 rounded-lg">
               <div className="flex items-center gap-3">
                 <i className={`${category.icon} fa-fw text-lg`} style={{ color: category.color }}></i>
-                <span className="font-semibold text-neutral-200">{category.name}</span>
+                <span className="font-semibold text-gray-800 dark:text-neutral-200">{category.name}</span>
               </div>
-              <span className="font-bold text-lg text-red-400">-${amount.toFixed(2)}</span>
+              <span className="font-bold text-lg text-red-500 dark:text-red-400">-${amount.toFixed(2)}</span>
             </div>
           ))
         ) : (
-          <p className="text-center text-neutral-500 py-4">No hay gastos registrados en este período.</p>
+          <p className="text-center text-gray-500 dark:text-neutral-500 py-4">No hay gastos registrados en este período.</p>
         )}
       </div>
 
-      <div className="border-t border-neutral-700 pt-3 mt-3 flex justify-between items-center">
-        <span className="font-bold text-neutral-100 text-lg">Total Gastado</span>
-        <span className="font-extrabold text-2xl text-red-400">-${totalSpent.toFixed(2)}</span>
+      <div className="border-t border-gray-200 dark:border-neutral-700 pt-3 mt-3 flex justify-between items-center">
+        <span className="font-bold text-gray-900 dark:text-neutral-100 text-lg">Total Gastado</span>
+        <span className="font-extrabold text-2xl text-red-500 dark:text-red-400">-${totalSpent.toFixed(2)}</span>
       </div>
     </div>
   );
@@ -121,6 +121,38 @@ export const MainApp: React.FC<MainAppProps> = ({ currentUser, onLogout }) => {
   
   // State for menu
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Theme state
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    try {
+        const storedTheme = window.localStorage.getItem('financial-organizer-theme') as 'light' | 'dark';
+        return storedTheme || 'dark';
+    } catch {
+        return 'dark';
+    }
+  });
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+
+    if (theme === 'light') {
+        root.classList.remove('dark');
+        if (themeColorMeta) themeColorMeta.setAttribute('content', '#f9fafb');
+    } else {
+        root.classList.add('dark');
+        if (themeColorMeta) themeColorMeta.setAttribute('content', '#171717');
+    }
+    try {
+        window.localStorage.setItem('financial-organizer-theme', theme);
+    } catch (error) {
+        console.warn('Could not save theme to localStorage.', error);
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => (prevTheme === 'dark' ? 'light' : 'dark'));
+  };
   
   // State for budgets and UI
   const [savedBudgets, setSavedBudgets] = useState<BudgetRecord[]>(() => {
@@ -219,6 +251,37 @@ export const MainApp: React.FC<MainAppProps> = ({ currentUser, onLogout }) => {
   const [forceCreateInfo, setForceCreateInfo] = useState<{ startDate: Date, endDate: Date } | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [budgetToDelete, setBudgetToDelete] = useState<BudgetRecord | null>(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  // User Profile State
+  const [currentUserProfile, setCurrentUserProfile] = useState<User | null>(null);
+  
+  const getUsers = useCallback(() => {
+    try {
+      const users = window.localStorage.getItem('financial-organizer-users');
+      return users ? JSON.parse(users) : {};
+    } catch { return {}; }
+  }, []);
+  
+  useEffect(() => {
+    const users = getUsers();
+    const userData = users[currentUser];
+    if (userData && typeof userData === 'object') {
+        setCurrentUserProfile(userData);
+    }
+  }, [currentUser, getUsers]);
+
+  const handleUpdateAvatar = (avatarId: string) => {
+    const users = getUsers();
+    if (users[currentUser]) {
+      const updatedUser = { ...users[currentUser], avatarId };
+      const updatedUsers = { ...users, [currentUser]: updatedUser };
+      window.localStorage.setItem('financial-organizer-users', JSON.stringify(updatedUsers));
+      setCurrentUserProfile(updatedUser);
+    }
+    setIsProfileModalOpen(false);
+  };
+
 
   // Scroll effect for FAB
   useEffect(() => {
@@ -536,10 +599,19 @@ export const MainApp: React.FC<MainAppProps> = ({ currentUser, onLogout }) => {
   ];
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header activeTab={activeTab} onTabChange={setActiveTab} onMenuClick={() => setIsMenuOpen(true)} />
-      <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} currentUser={currentUser} onLogout={onLogout} />
-      <main className="container mx-auto px-4 md:px-8 py-8 pb-24 md:pb-8">
+      <SideMenu 
+        isOpen={isMenuOpen} 
+        onClose={() => setIsMenuOpen(false)} 
+        currentUser={currentUser} 
+        onLogout={onLogout}
+        avatarId={currentUserProfile?.avatarId || '0'}
+        onOpenProfileEditor={() => setIsProfileModalOpen(true)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+      />
+      <main className="flex-grow container mx-auto px-4 md:px-8 py-8 pb-24 md:pb-8">
         {activeTab === 'dashboard' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
@@ -651,6 +723,12 @@ export const MainApp: React.FC<MainAppProps> = ({ currentUser, onLogout }) => {
             budgetDate={budgetToDelete.dateSaved}
         />
       )}
-    </>
+       <ProfileCustomizationModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        currentAvatarId={currentUserProfile?.avatarId || '0'}
+        onSelectAvatar={handleUpdateAvatar}
+      />
+    </div>
   );
 };
