@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LoginView } from './components/LoginView';
 import { MainApp } from './MainApp';
 
 const App: React.FC = () => {
-    const [currentUser, setCurrentUser] = useState<string | null>(() => {
-        // Use localStorage to persist the session across browser closures
-        return window.localStorage.getItem('financial-organizer-currentUser');
-    });
+    const [currentUser, setCurrentUser] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true); // Estado de carga
+
+    useEffect(() => {
+        // Se ejecuta solo en el navegador, después del renderizado inicial
+        const storedUser = window.localStorage.getItem('financial-organizer-currentUser');
+        setCurrentUser(storedUser);
+        setIsLoading(false); // Terminamos la carga
+    }, []); // El array vacío asegura que solo se ejecute una vez
 
     const handleLogin = (username: string) => {
         window.localStorage.setItem('financial-organizer-currentUser', username);
@@ -17,7 +22,11 @@ const App: React.FC = () => {
         window.localStorage.removeItem('financial-organizer-currentUser');
         setCurrentUser(null);
     };
-    
+
+    if (isLoading) {
+        return <div>Cargando...</div>; // Muestra un mensaje mientras se verifica la sesión
+    }
+
     return (
         <>
             {!currentUser ? (
